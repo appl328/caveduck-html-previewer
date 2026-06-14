@@ -23,6 +23,7 @@ button:hover{background:#252b3d}
 button.active{border-color:#7aa2ff;background:#22345f;color:#fff}
 button.good{border-color:#3f7f58;background:#183624}
 button.bad{border-color:#7f3f3f;background:#351b1b}
+button.undo{border-color:#7d6825;background:#2b2614;color:#ffe3a1}
 select,input{width:100%;background:#0c0f16;color:#e8e8e8;border:1px solid #343a49;border-radius:8px;padding:8px;font-size:12px}
 textarea{width:100%;height:100%;resize:none;background:#0c0f16;color:#f0f0f0;border:0;padding:14px;font-size:13px;line-height:1.45;outline:none;tab-size:2}
 .editorWrap{flex:1;min-height:330px;display:flex;flex-direction:column}
@@ -63,7 +64,7 @@ iframe{display:block;width:100%;height:680px;border:0;background:#fff}
 <div class="app">
 <header class="header">
 <h1 class="title">Caveduck HTML Previewer</h1>
-<p class="desc">케이브덕용 HTML을 미리 확인하고, 화면 폭·줄바꿈·사용 제한 태그를 점검하는 도구입니다.</p>
+<p class="desc">케이브덕용 HTML을 미리 확인하고, 컴퓨터와 모바일 화면 폭에서 어떻게 보이는지 한 번에 확인하면서 실시간으로 코드를 수정하기 위한 도구입니다.</p>
 </header>
 <main class="main">
 <section class="panel">
@@ -97,9 +98,10 @@ iframe{display:block;width:100%;height:680px;border:0;background:#fff}
 <div class="group">
 <div class="label">작업</div>
 <div class="btnrow">
-<button id="sampleBtn">안내 샘플</button>
 <button id="minifyBtn">한 줄 정리</button>
 <button id="copyBtn" class="good">코드 복사</button>
+<button id="undoBtn" class="undo">되돌리기</button>
+<button id="sampleBtn">안내 샘플</button>
 <button id="clearBtn" class="bad">비우기</button>
 </div>
 </div>
@@ -180,9 +182,37 @@ img,video{max-width:100%;height:auto}
 @keyframes wobble{0%{transform:translate3d(0,0,0)}15%{transform:translate3d(-8%,0,0) rotate3d(0,0,1,-3deg)}30%{transform:translate3d(6%,0,0) rotate3d(0,0,1,2deg)}45%{transform:translate3d(-4%,0,0) rotate3d(0,0,1,-2deg)}60%{transform:translate3d(3%,0,0) rotate3d(0,0,1,1deg)}75%{transform:translate3d(-2%,0,0) rotate3d(0,0,1,-1deg)}100%{transform:translate3d(0,0,0)}}
 </style>`;
 let currentDevice='desktop';
-const sample=`<div style="width:100%;max-width:680px;margin:0 auto;box-sizing:border-box;background:#ffffff;color:#222;border:1px solid #d8dde8;border-radius:14px;padding:20px;line-height:1.65;box-shadow:0 10px 28px rgba(0,0,0,.10);font-family:'Pretendard','Noto Serif','Arial',sans-serif;"><p style="margin:0 0 10px 0;font-size:22px;font-weight:800;">Caveduck HTML Previewer 안내</p><p style="margin:0 0 12px 0;font-size:14px;">이 페이지는 케이브덕에서 사용할 HTML을 미리 붙여 보고, 화면 폭과 줄바꿈, 제한 태그 사용 여부를 확인하기 위한 도구입니다. 디자인 확인과 수정을 돕기 위한 페이지이며, 모든 기기와 브라우저의 표시 결과를 100% 재현하지는 않습니다. \(모바일에서도 사용은 가능하지만, 모바일 기기 폭의 한계로 PC 폭 미리보기는 정확히 확인하기 어렵습니다. 모든 기능을 편하게 사용하려면 PC 환경을 권장합니다.\)</p><hr style="border:0;border-top:1px solid #d8dde8;margin:14px 0;"><p style="margin:0 0 8px 0;font-size:15px;font-weight:700;">공식 지원 폰트와 기기별 폰트</p><p style="margin:0 0 12px 0;font-size:14px;">Caveduck에서 공식으로 지원하는 폰트는 Pretendard와 Noto Serif 두 가지입니다. 그 외의 폰트는 사용자의 기기에 설치되어 있는 폰트가 적용되는 방식입니다. Windows, macOS, iPhone, Android는 기본으로 제공하는 폰트가 서로 다릅니다. 그래서 같은 HTML이라도 글자 폭, 줄바꿈, 분위기가 조금씩 달라질 수 있습니다. 왼쪽의 폰트 목록은 기기별로 참고할 수 있는 폰트를 정리한 목록입니다.</p><p style="margin:0 0 8px 0;font-size:15px;font-weight:700;">폰트는 스택 형식으로 사용하는 것을 권장합니다</p><p style="margin:0 0 8px 0;font-size:14px;">한 가지 폰트만 지정하면 해당 기기에 그 폰트가 없을 때 의도와 다르게 보일 수 있습니다. 여러 폰트를 순서대로 적어 두면 앞의 폰트가 없을 때 다음 폰트로 자연스럽게 대체됩니다.</p><div style="margin:10px 0;padding:10px;border-radius:10px;background:#f5f7fb;border:1px solid #d8dde8;font-size:13px;font-family:'Courier New','Courier',monospace;">font-family:'Bodoni 72','Bodoni MT','Didot','Hoefler Text','Georgia','Times New Roman',serif;</div><p style="margin:0 0 8px 0;font-size:15px;font-weight:700;">AI에게 폰트 스택을 요청하는 예시</p><p style="margin:0 0 8px 0;font-size:14px;">특정 폰트를 여러 기기에서 비슷한 분위기로 보이게 하고 싶다면, ChatGPT, Gemini, Claude 등에 아래처럼 요청해 보세요. \(Android는 기본적으로 사용할 수 있는 폰트 선택지가 적기 때문에 예시 요청에서 제외했습니다.\)</p><div style="margin:10px 0;padding:10px;border-radius:10px;background:#f5f7fb;border:1px solid #d8dde8;font-size:13px;font-family:'Courier New','Courier',monospace;">Bodoni 72 느낌의 폰트를 Windows, macOS, iPhone에서 최대한 자연스럽게 보이도록 시스템 폰트 기반 font-family 스택으로 만들어 주세요. Caveduck HTML에 넣을 수 있게 inline style용 CSS 한 줄로 작성해 주세요.</div><p style="margin:0 0 8px 0;font-size:15px;font-weight:700;">문제 코드 표시란?</p><p style="margin:0 0 12px 0;font-size:14px;">문제 코드 표시는 Caveduck HTML 규칙을 벗어난 태그나 속성을 참고용으로 표시하는 기능입니다. 실제 플랫폼 반영 결과와 완전히 동일한 판정기는 아니며, HTML을 수정할 때 확인용으로 사용해 주세요.</p><p style="margin:0 0 8px 0;font-size:15px;font-weight:700;">주의 사항</p><p style="margin:0 0 12px 0;font-size:14px;">이 페이지는 모든 운영체제와 브라우저를 100% 재현하는 도구가 아닙니다. 실제 표시 결과는 접속한 기기, OS 버전, 브라우저, 설치된 폰트에 따라 달라질 수 있습니다. 디자인과 줄바꿈을 대략 확인하는 용도로 사용해 주세요.</p><p style="margin:0 0 8px 0;font-size:13px;color:#667;">문제가 있거나 수정이 필요한 부분이 있다면 케이브덕 @apple 크리에이터 페이지에 댓글을 남겨 주세요.</p><p style="margin:0;font-size:13px;color:#667;">저는 HTML 전문가가 아닙니다. 구체적인 코드 작성이나 오류 해결은 ChatGPT, Gemini, Claude 등 AI 도구의 도움을 받는 것을 권장합니다.</p></div>`;
+let undoStack=[];
+let lastPreviewScrollTop=0;
+const sample=`<div style="width:100%;max-width:680px;margin:0 auto;box-sizing:border-box;background:#ffffff;color:#222;border:1px solid #d8dde8;border-radius:14px;padding:20px;line-height:1.65;box-shadow:0 10px 28px rgba(0,0,0,.10);font-family:'Pretendard','Noto Serif','Arial',sans-serif;"><p style="margin:0 0 10px 0;font-size:22px;font-weight:800;">Caveduck HTML Previewer 안내</p><p style="margin:0 0 12px 0;font-size:14px;">이 페이지는 케이브덕에서 사용할 HTML을 미리 붙여 보고, 컴퓨터와 모바일 화면 폭에서 어떻게 보이는지 확인하면서 실시간으로 코드를 수정하기 위해 만든 도구입니다. 화면 폭과 줄바꿈, 제한 태그 사용 여부, 코드블럭 포함 여부 등을 확인할 수 있으며, 한 줄 정리와 코드 복사 기능을 제공합니다. 디자인 확인과 수정을 돕기 위한 페이지이며, 모든 기기와 브라우저의 표시 결과를 100% 재현하지는 않습니다. \(모바일에서도 사용은 가능하지만, 모바일 기기 폭의 한계로 PC 폭 미리보기는 정확히 확인하기 어렵습니다. 모든 기능을 편하게 사용하려면 PC 환경을 권장합니다.\)</p><hr style="border:0;border-top:1px solid #d8dde8;margin:14px 0;"><p style="margin:0 0 8px 0;font-size:15px;font-weight:700;">공식 지원 폰트와 기기별 폰트</p><p style="margin:0 0 12px 0;font-size:14px;">Caveduck에서 공식으로 지원하는 폰트는 Pretendard와 Noto Serif 두 가지입니다. 그 외의 폰트는 사용자의 기기에 설치되어 있는 폰트가 적용되는 방식입니다. Windows, macOS, iPhone, Android는 기본으로 제공하는 폰트가 서로 다릅니다. 그래서 같은 HTML이라도 글자 폭, 줄바꿈, 분위기가 조금씩 달라질 수 있습니다. 왼쪽의 폰트 목록은 기기별로 참고할 수 있는 폰트를 정리한 목록입니다.</p><p style="margin:0 0 8px 0;font-size:15px;font-weight:700;">폰트는 스택 형식으로 사용하는 것을 권장합니다</p><p style="margin:0 0 8px 0;font-size:14px;">한 가지 폰트만 지정하면 해당 기기에 그 폰트가 없을 때 의도와 다르게 보일 수 있습니다. 여러 폰트를 순서대로 적어 두면 앞의 폰트가 없을 때 다음 폰트로 자연스럽게 대체됩니다.</p><div style="margin:10px 0;padding:10px;border-radius:10px;background:#f5f7fb;border:1px solid #d8dde8;font-size:13px;font-family:'Courier New','Courier',monospace;">font-family:'Bodoni 72','Bodoni MT','Didot','Hoefler Text','Georgia','Times New Roman',serif;</div><p style="margin:0 0 8px 0;font-size:15px;font-weight:700;">AI에게 폰트 스택을 요청하는 예시</p><p style="margin:0 0 8px 0;font-size:14px;">특정 폰트를 여러 기기에서 비슷한 분위기로 보이게 하고 싶다면, ChatGPT, Gemini, Claude 등에 아래처럼 요청해 보세요. \(Android는 기본적으로 사용할 수 있는 폰트 선택지가 적기 때문에 예시 요청에서 제외했습니다.\)</p><div style="margin:10px 0;padding:10px;border-radius:10px;background:#f5f7fb;border:1px solid #d8dde8;font-size:13px;font-family:'Courier New','Courier',monospace;">Bodoni 72 느낌의 폰트를 Windows, macOS, iPhone에서 최대한 자연스럽게 보이도록 시스템 폰트 기반 font-family 스택으로 만들어 주세요. Caveduck HTML에 넣을 수 있게 inline style용 CSS 한 줄로 작성해 주세요.</div><p style="margin:0 0 8px 0;font-size:15px;font-weight:700;">문제 코드 표시란?</p><p style="margin:0 0 12px 0;font-size:14px;">문제 코드 표시는 Caveduck HTML 규칙을 벗어난 태그나 속성을 참고용으로 표시하는 기능입니다. 실제 플랫폼 반영 결과와 완전히 동일한 판정기는 아니며, HTML을 수정할 때 확인용으로 사용해 주세요.</p><p style="margin:0 0 8px 0;font-size:15px;font-weight:700;">주의 사항</p><p style="margin:0 0 12px 0;font-size:14px;">이 페이지는 모든 운영체제와 브라우저를 100% 재현하는 도구가 아닙니다. 실제 표시 결과는 접속한 기기, OS 버전, 브라우저, 설치된 폰트에 따라 달라질 수 있습니다. 디자인과 줄바꿈을 대략 확인하는 용도로 사용해 주세요.</p><p style="margin:0 0 8px 0;font-size:13px;color:#667;">문제가 있거나 수정이 필요한 부분이 있다면 케이브덕 @apple 크리에이터 페이지에 댓글을 남겨 주세요.</p><p style="margin:0;font-size:13px;color:#667;">저는 HTML 전문가가 아닙니다. 구체적인 코드 작성이나 오류 해결은 ChatGPT, Gemini, Claude 등 AI 도구의 도움을 받는 것을 권장합니다.</p></div>`;
 function escapeHtml(s){return s.replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
 function setActive(buttons,attr,value){buttons.forEach(b=>b.classList.toggle('active',b.dataset[attr]===value));}
+function rememberUndo(){
+const v=codeInput.value;
+if(undoStack[undoStack.length-1]!==v){
+undoStack.push(v);
+if(undoStack.length>20)undoStack.shift();
+}
+}
+function restoreUndo(){
+if(!undoStack.length){
+saveState.textContent='되돌릴 내용 없음';
+return;
+}
+codeInput.value=undoStack.pop();
+render(false);
+saveState.textContent='되돌림 완료';
+}
+function getPreviewScroll(){
+try{
+const w=preview.contentWindow;
+if(w&&w.document)lastPreviewScrollTop=w.document.documentElement.scrollTop||w.document.body.scrollTop||0;
+}catch(e){}
+}
+function restorePreviewScroll(){
+const target=lastPreviewScrollTop;
+preview.onload=()=>{try{preview.contentWindow.scrollTo(0,target);}catch(e){}};
+}
 function renderFontList(){
 const group=fontGroup.value;
 fontList.innerHTML='';
@@ -196,7 +226,9 @@ fontList.appendChild(item);
 fontHelp.innerHTML=fontHelpText[group];
 }
 function updateStatus(){currentStatus.textContent=`Device: ${devicePresets[currentDevice]?.name||'Custom'} · Width: ${widthRange.value}px`;}
-function render(){
+function render(keepScroll=true){
+if(keepScroll)getPreviewScroll();
+restorePreviewScroll();
 const userHtml=codeInput.value;
 const srcdoc=`<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">${previewBaseCSS}</head><body>${userHtml}</body></html>`;
 preview.srcdoc=srcdoc;
@@ -301,15 +333,16 @@ deviceButtons.forEach(btn=>{btn.addEventListener('click',()=>{currentDevice=btn.
 widthRange.addEventListener('input',()=>{currentDevice='custom';deviceButtons.forEach(b=>b.classList.remove('active'));setWidth(widthRange.value);render();});
 fontGroup.addEventListener('change',renderFontList);
 codeInput.addEventListener('input',()=>{saveState.textContent='저장 중...';render();});
-document.getElementById('sampleBtn').addEventListener('click',()=>{codeInput.value=sample;render();});
-document.getElementById('minifyBtn').addEventListener('click',()=>{codeInput.value=codeInput.value.replace(/\n+/g,' ').replace(/\t+/g,' ').replace(/\s{2,}/g,' ').replace(/>\s+</g,'><').trim();render();});
+document.getElementById('sampleBtn').addEventListener('click',()=>{rememberUndo();codeInput.value=sample;render(false);saveState.textContent='안내 샘플 적용됨';});
+document.getElementById('minifyBtn').addEventListener('click',()=>{rememberUndo();codeInput.value=codeInput.value.replace(/\n+/g,' ').replace(/\t+/g,' ').replace(/\s{2,}/g,' ').replace(/>\s+</g,'><').trim();render();saveState.textContent='한 줄 정리됨';});
 document.getElementById('copyBtn').addEventListener('click',async()=>{try{await navigator.clipboard.writeText(codeInput.value);saveState.textContent='복사됨';}catch(e){codeInput.select();document.execCommand('copy');saveState.textContent='복사됨';}});
-document.getElementById('clearBtn').addEventListener('click',()=>{codeInput.value='';render();});
+document.getElementById('undoBtn').addEventListener('click',restoreUndo);
+document.getElementById('clearBtn').addEventListener('click',()=>{rememberUndo();codeInput.value='';render(false);saveState.textContent='비움';});
 const saved=localStorage.getItem('caveduckPreviewerCode');
 codeInput.value=saved||sample;
 renderFontList();
 setWidth(720);
-render();
+render(false);
 </script>
 </body>
 </html>
