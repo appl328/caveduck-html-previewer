@@ -1,1 +1,268 @@
-<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Caveduck HTML Previewer</title></head><body style="margin:0;background:#111;color:#eee;font-family:Arial,sans-serif;"><div style="padding:24px;"><h1 style="margin:0 0 12px 0;">Caveduck HTML Previewer</h1><p style="margin:0;">여기까지 보이면 일단 사이트 뼈대 성공임</p></div></body></html>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Caveduck HTML Previewer</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#0f1115;color:#e8e8e8;font-family:Arial,'Helvetica Neue',Helvetica,sans-serif}
+button,textarea,select,input{font-family:inherit}
+.app{min-height:100vh;display:flex;flex-direction:column}
+.header{padding:18px 20px;border-bottom:1px solid #2a2e38;background:#151821}
+.title{font-size:22px;font-weight:800;margin:0 0 6px}
+.desc{font-size:13px;color:#aab0c0;margin:0}
+.main{display:grid;grid-template-columns:420px 1fr;gap:0;min-height:calc(100vh - 76px)}
+.panel{border-right:1px solid #2a2e38;background:#11141c;display:flex;flex-direction:column;min-height:0}
+.controls{padding:14px;border-bottom:1px solid #2a2e38}
+.group{margin-bottom:12px}
+.label{font-size:12px;color:#aab0c0;margin-bottom:6px;font-weight:700}
+.btnrow{display:flex;flex-wrap:wrap;gap:6px}
+button{border:1px solid #343a49;background:#1b2030;color:#e8e8e8;border-radius:8px;padding:8px 10px;font-size:12px;cursor:pointer}
+button:hover{background:#252b3d}
+button.active{border-color:#7aa2ff;background:#22345f;color:#fff}
+button.good{border-color:#3f7f58;background:#183624}
+button.bad{border-color:#7f3f3f;background:#351b1b}
+select,input{width:100%;background:#0c0f16;color:#e8e8e8;border:1px solid #343a49;border-radius:8px;padding:8px;font-size:12px}
+textarea{width:100%;height:100%;resize:none;background:#0c0f16;color:#f0f0f0;border:0;padding:14px;font-size:13px;line-height:1.45;outline:none;tab-size:2}
+.editorWrap{flex:1;min-height:340px;display:flex;flex-direction:column}
+.editorTop{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-bottom:1px solid #2a2e38;background:#151821}
+.editorTitle{font-size:12px;color:#aab0c0;font-weight:700}
+.previewArea{min-width:0;background:#0b0d12;display:flex;flex-direction:column}
+.previewTop{padding:12px 14px;border-bottom:1px solid #2a2e38;background:#151821;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.status{font-size:12px;color:#aab0c0}
+.previewStage{flex:1;overflow:auto;padding:24px;display:flex;justify-content:center;align-items:flex-start}
+.deviceFrame{background:#f7f7f7;border:1px solid #3a4050;border-radius:14px;box-shadow:0 18px 45px rgba(0,0,0,.35);overflow:hidden;transition:width .18s ease;min-height:520px}
+.deviceBar{height:32px;background:#e9ecf2;border-bottom:1px solid #ccd1dc;display:flex;align-items:center;gap:6px;padding:0 10px}
+.dot{width:10px;height:10px;border-radius:99px;background:#d85a5a}
+.dot:nth-child(2){background:#d8b85a}
+.dot:nth-child(3){background:#5abf72}
+iframe{display:block;width:100%;height:680px;border:0;background:#fff}
+.report{padding:12px 14px;border-top:1px solid #2a2e38;background:#11141c;max-height:210px;overflow:auto}
+.reportTitle{font-size:12px;color:#aab0c0;font-weight:800;margin-bottom:8px}
+.msg{font-size:12px;line-height:1.45;margin:5px 0;padding:7px 9px;border-radius:8px;border:1px solid #333}
+.ok{background:#112719;border-color:#2e7547;color:#bff0ce}
+.warn{background:#2b2614;border-color:#7d6825;color:#ffe3a1}
+.err{background:#2b1515;border-color:#7a3030;color:#ffb3b3}
+.info{background:#151d2b;border-color:#334b75;color:#c9dcff}
+.small{font-size:11px;color:#8e96aa;line-height:1.45;margin-top:6px}
+@media(max-width:900px){.main{grid-template-columns:1fr}.panel{border-right:0;border-bottom:1px solid #2a2e38}.editorWrap{height:420px}.previewStage{padding:14px}.deviceFrame{max-width:100%}}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="header">
+<h1 class="title">Caveduck HTML Previewer</h1>
+<p class="desc">케이브덕식 inline HTML 미리보기 · 기기 폭 · OS별 폰트 스택 · 규칙 검사</p>
+</header>
+<main class="main">
+<section class="panel">
+<div class="controls">
+<div class="group">
+<div class="label">기기 프리셋</div>
+<div class="btnrow">
+<button data-device="desktop" class="active">PC 720</button>
+<button data-device="wide">PC 1024</button>
+<button data-device="iphone">iPhone 390</button>
+<button data-device="android">Android 360</button>
+</div>
+</div>
+<div class="group">
+<div class="label">OS 폰트 프리셋</div>
+<div class="btnrow">
+<button data-font="windows">Windows</button>
+<button data-font="mac" class="active">macOS</button>
+<button data-font="iphone">iPhone</button>
+<button data-font="android">Android</button>
+</div>
+<div class="small">없는 폰트는 실제로 렌더링 안 됨. 접속 기기에 설치된 폰트 기준으로 fallback 됨.</div>
+</div>
+<div class="group">
+<div class="label">수동 폭 조절</div>
+<input id="widthRange" type="range" min="320" max="1200" value="720">
+<div class="small"><span id="widthText">720</span>px</div>
+</div>
+<div class="group">
+<div class="label">작업</div>
+<div class="btnrow">
+<button id="sampleBtn">샘플</button>
+<button id="minifyBtn">한 줄 정리</button>
+<button id="copyBtn" class="good">코드 복사</button>
+<button id="clearBtn" class="bad">비우기</button>
+</div>
+</div>
+</div>
+<div class="editorWrap">
+<div class="editorTop">
+<div class="editorTitle">HTML 입력</div>
+<div class="small" id="saveState">자동 저장됨</div>
+</div>
+<textarea id="codeInput" spellcheck="false"></textarea>
+</div>
+</section>
+<section class="previewArea">
+<div class="previewTop">
+<div class="status" id="currentStatus">Device: PC 720 · Font: macOS</div>
+<div class="status">미리보기 iframe sandbox 적용 중</div>
+</div>
+<div class="previewStage">
+<div class="deviceFrame" id="deviceFrame" style="width:720px">
+<div class="deviceBar"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+<iframe id="preview" sandbox=""></iframe>
+</div>
+</div>
+<div class="report">
+<div class="reportTitle">검사 결과</div>
+<div id="reportBox"></div>
+</div>
+</section>
+</main>
+</div>
+<script>
+const codeInput=document.getElementById('codeInput');
+const preview=document.getElementById('preview');
+const deviceFrame=document.getElementById('deviceFrame');
+const widthRange=document.getElementById('widthRange');
+const widthText=document.getElementById('widthText');
+const reportBox=document.getElementById('reportBox');
+const currentStatus=document.getElementById('currentStatus');
+const saveState=document.getElementById('saveState');
+const deviceButtons=[...document.querySelectorAll('[data-device]')];
+const fontButtons=[...document.querySelectorAll('[data-font]')];
+const devicePresets={
+desktop:{name:'PC 720',width:720},
+wide:{name:'PC 1024',width:1024},
+iphone:{name:'iPhone 390',width:390},
+android:{name:'Android 360',width:360}
+};
+const fontPresets={
+windows:{name:'Windows',stack:"'Segoe UI','Malgun Gothic','Arial','Helvetica Neue',sans-serif"},
+mac:{name:'macOS',stack:"-apple-system,BlinkMacSystemFont,'Helvetica Neue','Apple SD Gothic Neo','Arial',sans-serif"},
+iphone:{name:'iPhone',stack:"-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Helvetica Neue','Arial',sans-serif"},
+android:{name:'Android',stack:"'Roboto','Noto Sans KR','Droid Sans','Arial',sans-serif"}
+};
+const allowedTags=['div','br','hr','p','span','b','i','strong','em','a','img'];
+const warningTags=['details','summary'];
+const forbiddenTags=['script','style','link','iframe','object','embed','form','input','button','textarea','select','option','table','thead','tbody','tr','td','th','ul','ol','li','h1','h2','h3','h4','h5','h6','meta','base','svg','canvas','video','audio'];
+let currentDevice='desktop';
+let currentFont='mac';
+const sample=`<div style="width:100%;max-width:520px;margin:0 auto;box-sizing:border-box;background:linear-gradient(135deg,#fffaf4 0%,#fff5e8 50%,#fffcf8 100%);color:#5b4631;border:1px solid #e8c9a6;border-radius:14px;padding:16px 18px;line-height:1.55;box-shadow:0 8px 24px rgba(120,80,30,.12);font-family:'Arial','Helvetica Neue','Helvetica',sans-serif;"><p style="margin:0 0 8px 0;font-size:18px;font-weight:800;">Caveduck HTML Test</p><p style="margin:0 0 10px 0;font-size:13px;">이 샘플이 모바일 폭에서 줄바꿈 안 터지면 일단 살았음</p><hr style="border:0;border-top:1px solid #e8c9a6;margin:12px 0;"><div style="display:flex;gap:8px;flex-wrap:wrap;"><span style="display:inline-block;padding:5px 8px;border-radius:999px;background:#fff;border:1px solid #e8c9a6;font-size:12px;">inline style</span><span style="display:inline-block;padding:5px 8px;border-radius:999px;background:#fff;border:1px solid #e8c9a6;font-size:12px;">mobile check</span></div></div>`;
+function escapeHtml(s){return s.replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
+function setActive(buttons,attr,value){buttons.forEach(b=>b.classList.toggle('active',b.dataset[attr]===value));}
+function updateStatus(){
+currentStatus.textContent=`Device: ${devicePresets[currentDevice]?.name||'Custom'} · Width: ${widthRange.value}px · Font: ${fontPresets[currentFont].name}`;
+}
+function render(){
+const userHtml=codeInput.value;
+const fontStack=fontPresets[currentFont].stack;
+const srcdoc=`<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"></head><body style="margin:0;padding:16px;background:#ffffff;color:#111111;font-family:${fontStack};"><div id="previewRoot" style="width:100%;box-sizing:border-box;font-family:${fontStack};">${userHtml}</div></body></html>`;
+preview.srcdoc=srcdoc;
+validate(userHtml);
+localStorage.setItem('caveduckPreviewerCode',userHtml);
+saveState.textContent='자동 저장됨';
+updateStatus();
+}
+function validate(html){
+const messages=[];
+if(!html.trim()){
+messages.push({type:'info',text:'HTML을 입력하면 여기서 규칙 검사함'});
+report(messages);
+return;
+}
+const parser=new DOMParser();
+const doc=parser.parseFromString(`<div>${html}</div>`,'text/html');
+const all=[...doc.body.querySelectorAll('*')];
+const used={};
+const bad=[];
+const warn=[];
+all.forEach(el=>{
+const tag=el.tagName.toLowerCase();
+used[tag]=(used[tag]||0)+1;
+if(forbiddenTags.includes(tag)||(!allowedTags.includes(tag)&&!warningTags.includes(tag))) bad.push(tag);
+if(warningTags.includes(tag)) warn.push(tag);
+if(tag==='img'){
+if(!el.getAttribute('src')) messages.push({type:'err',text:'img 태그에 src 없음. 이미지 안 뜸'});
+if(!el.getAttribute('style')) messages.push({type:'warn',text:'img 태그에 style 없음. width, height, object-fit 없으면 화면 터질 수 있음'});
+}
+if(tag==='a'&&!el.getAttribute('href')) messages.push({type:'warn',text:'a 태그에 href 없음'});
+});
+const uniqueBad=[...new Set(bad)];
+const uniqueWarn=[...new Set(warn)];
+const uniqueUsed=Object.keys(used);
+if(uniqueBad.length) messages.push({type:'err',text:`금지/비허용 태그 발견: ${uniqueBad.join(', ')}`});
+else messages.push({type:'ok',text:'허용 태그 기준 통과'});
+if(uniqueWarn.length) messages.push({type:'warn',text:`주의 태그 발견: ${uniqueWarn.join(', ')} · 케이브덕 환경에서 작동 차이 날 수 있음`});
+if(/<\s*style[\s>]/i.test(html)) messages.push({type:'err',text:'style 태그 발견. 케이브덕 규칙상 CSS는 style="" 인라인으로 박아야 함'});
+if(/<\s*script[\s>]/i.test(html)) messages.push({type:'err',text:'script 태그 발견. 당연히 빼라 ㅅㅂ'});
+if(/<\s*link[\s>]/i.test(html)) messages.push({type:'err',text:'link 태그 발견. 외부 스타일시트 금지'});
+if(/class\s*=/i.test(html)) messages.push({type:'warn',text:'class 속성 발견. 외부/내부 CSS 못 쓰는 환경이면 의미 없음'});
+if(/style\s*=/i.test(html)) messages.push({type:'ok',text:'inline style 사용 중'});
+else messages.push({type:'warn',text:'style=""가 안 보임. 케이브덕식 꾸미기면 거의 무조건 필요함'});
+if(html.includes('\n')) messages.push({type:'warn',text:'줄바꿈 있음. 최종 업로드용은 한 줄 정리 버튼으로 minify 권장'});
+if(html.length>12000) messages.push({type:'warn',text:`코드가 ${html.length}자임. 너무 길면 플랫폼에서 잘릴 수 있음`});
+messages.push({type:'info',text:`사용 태그: ${uniqueUsed.length?uniqueUsed.join(', '):'없음'}`});
+report(messages);
+}
+function report(messages){
+reportBox.innerHTML=messages.map(m=>`<div class="msg ${m.type}">${escapeHtml(m.text)}</div>`).join('');
+}
+function setWidth(w){
+deviceFrame.style.width=w+'px';
+widthRange.value=w;
+widthText.textContent=w;
+updateStatus();
+}
+deviceButtons.forEach(btn=>{
+btn.addEventListener('click',()=>{
+currentDevice=btn.dataset.device;
+setActive(deviceButtons,'device',currentDevice);
+setWidth(devicePresets[currentDevice].width);
+render();
+});
+});
+fontButtons.forEach(btn=>{
+btn.addEventListener('click',()=>{
+currentFont=btn.dataset.font;
+setActive(fontButtons,'font',currentFont);
+render();
+});
+});
+widthRange.addEventListener('input',()=>{
+currentDevice='custom';
+deviceButtons.forEach(b=>b.classList.remove('active'));
+setWidth(widthRange.value);
+render();
+});
+codeInput.addEventListener('input',()=>{
+saveState.textContent='저장 중...';
+render();
+});
+document.getElementById('sampleBtn').addEventListener('click',()=>{
+codeInput.value=sample;
+render();
+});
+document.getElementById('minifyBtn').addEventListener('click',()=>{
+codeInput.value=codeInput.value.replace(/\n+/g,' ').replace(/\t+/g,' ').replace(/\s{2,}/g,' ').replace(/>\s+</g,'><').trim();
+render();
+});
+document.getElementById('copyBtn').addEventListener('click',async()=>{
+try{
+await navigator.clipboard.writeText(codeInput.value);
+saveState.textContent='복사됨';
+}catch(e){
+codeInput.select();
+document.execCommand('copy');
+saveState.textContent='복사됨';
+}
+});
+document.getElementById('clearBtn').addEventListener('click',()=>{
+codeInput.value='';
+render();
+});
+const saved=localStorage.getItem('caveduckPreviewerCode');
+codeInput.value=saved||sample;
+setWidth(720);
+render();
+</script>
+</body>
+</html>
