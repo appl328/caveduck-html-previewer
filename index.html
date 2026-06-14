@@ -72,10 +72,10 @@ iframe{display:block;width:100%;height:680px;border:0;background:#fff}
 <div class="label">기기 폭 프리셋</div>
 <div class="btnrow">
 <button data-device="desktop" class="active">PC 720</button>
-<button data-device="iphone">iPhone 390</button>
+<button data-device="iphone">iPhone 340</button>
 <button data-device="android">Android 360</button>
 </div>
-<div class="small">기기 버튼은 실제 기기를 완전히 재현하는 기능이 아니라, 자주 쓰이는 화면 폭을 빠르게 확인하기 위한 기능입니다.</div>
+<div class="small">기기 버튼은 실제 기기를 완전히 재현하는 기능이 아니라, 자주 쓰이는 화면 폭을 빠르게 확인하기 위한 기능입니다. 기기 폭 프리셋은 참고용이며, 실제 표시 결과는 기종별 화면 크기와 브라우저 환경에 따라 차이가 발생할 수 있습니다.</div>
 </div>
 <div class="group">
 <div class="label">기기별 폰트 목록</div>
@@ -156,7 +156,7 @@ const fontGroup=document.getElementById('fontGroup');
 const fontList=document.getElementById('fontList');
 const fontHelp=document.getElementById('fontHelp');
 const deviceButtons=[...document.querySelectorAll('[data-device]')];
-const devicePresets={desktop:{name:'PC 720',width:720},iphone:{name:'iPhone 390',width:390},android:{name:'Android 360',width:360}};
+const devicePresets={desktop:{name:'PC 720',width:720},iphone:{name:'iPhone 340',width:340},android:{name:'Android 360',width:360}};
 const fontData={
 official:['Pretendard','Noto Serif'],
 windows:['Arial','Arial Black','Bahnschrift','Calibri','Cambria','Candara','Cascadia Code','Cascadia Mono','Comic Sans MS','Consolas','Constantia','Corbel','Courier New','Ebrima','Franklin Gothic Medium','Gabriola','Gadugi','Georgia','Impact','Ink Free','Javanese Text','Leelawadee UI','Lucida Console','Lucida Sans Unicode','Malgun Gothic','Microsoft Himalaya','Microsoft JhengHei','Microsoft New Tai Lue','Microsoft PhagsPa','Microsoft Sans Serif','Microsoft Tai Le','Microsoft YaHei','Microsoft Yi Baiti','MingLiU-ExtB','Mongolian Baiti','MS Gothic','MV Boli','Myanmar Text','Nirmala UI','Palatino Linotype','Segoe Print','Segoe Script','Segoe UI','SimSun','Sitka','Sylfaen','Tahoma','Times New Roman','Trebuchet MS','Verdana','Yu Gothic'],
