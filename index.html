@@ -73,7 +73,7 @@ iframe{display:block;width:100%;height:680px;border:0;background:#fff}
 <div class="group">
 <div class="label">기기 폭 프리셋</div>
 <div class="btnrow">
-<button data-device="desktop" class="active">PC 720</button>
+<button data-device="desktop" class="active">PC 785</button>
 <button data-device="iphone">iPhone 340</button>
 <button data-device="android">Android 360</button>
 </div>
@@ -93,7 +93,7 @@ iframe{display:block;width:100%;height:680px;border:0;background:#fff}
 </div>
 <div class="group">
 <div class="label">수동 폭 조절</div>
-<input id="widthRange" type="range" min="320" max="850" value="720">
+<input id="widthRange" type="range" min="320" max="850" value="785">
 <div class="small"><span id="widthText">720</span>px</div>
 </div>
 <div class="group">
@@ -158,7 +158,7 @@ const fontGroup=document.getElementById('fontGroup');
 const fontList=document.getElementById('fontList');
 const fontHelp=document.getElementById('fontHelp');
 const deviceButtons=[...document.querySelectorAll('[data-device]')];
-const devicePresets={desktop:{name:'PC 720',width:720},iphone:{name:'iPhone 340',width:340},android:{name:'Android 360',width:360}};
+const devicePresets={desktop:{name:'PC 785',width:785},iphone:{name:'iPhone 340',width:340},android:{name:'Android 360',width:360}};
 const fontData={
 official:['Pretendard','Noto Serif'],
 windows:['Arial','Arial Black','Bahnschrift','Calibri','Cambria','Candara','Cascadia Code','Cascadia Mono','Comic Sans MS','Consolas','Constantia','Corbel','Courier New','Ebrima','Franklin Gothic Medium','Gabriola','Gadugi','Georgia','Impact','Ink Free','Javanese Text','Leelawadee UI','Lucida Console','Lucida Sans Unicode','Malgun Gothic','Microsoft Himalaya','Microsoft JhengHei','Microsoft New Tai Lue','Microsoft PhagsPa','Microsoft Sans Serif','Microsoft Tai Le','Microsoft YaHei','Microsoft Yi Baiti','MingLiU-ExtB','Mongolian Baiti','MS Gothic','MV Boli','Myanmar Text','Nirmala UI','Palatino Linotype','Segoe Print','Segoe Script','Segoe UI','SimSun','Sitka','Sylfaen','Tahoma','Times New Roman','Trebuchet MS','Verdana','Yu Gothic'],
